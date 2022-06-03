@@ -1,10 +1,23 @@
 package com.jpmc.theater;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class Movie {
-    private static int MOVIE_CODE_SPECIAL = 1;
+    //add final key word to make these as constants
+    private static final int MOVIE_CODE_SPECIAL = 1;
+    private static final int DISCOUNT_START_TIME = 11;
+    private static final int DISCOUNT_END_TIME = 16;
+    private static final int DISCOUNT_DAY_IN_MONTH = 7;
+
+    //<Key, Value> -> <sequenceOfTheDay, discountValue>
+    HashMap<Integer, Double> sequenceDiscountMap = new HashMap<Integer, Double>(){
+        {
+            put(1,3d);
+            put(2,2d);
+        }
+    };
 
     private String title;
     private String description;
@@ -12,8 +25,10 @@ public class Movie {
     private double ticketPrice;
     private int specialCode;
 
-    public Movie(String title, Duration runningTime, double ticketPrice, int specialCode) {
+    //add description in the constructor as well
+    public Movie(String title, String description, Duration runningTime, double ticketPrice, int specialCode) {
         this.title = title;
+        this.description = description;
         this.runningTime = runningTime;
         this.ticketPrice = ticketPrice;
         this.specialCode = specialCode;
@@ -21,6 +36,10 @@ public class Movie {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Duration getRunningTime() {
@@ -32,28 +51,36 @@ public class Movie {
     }
 
     public double calculateTicketPrice(Showing showing) {
-        return ticketPrice - getDiscount(showing.getSequenceOfTheDay());
+        return ticketPrice - getDiscount(showing);
     }
 
-    private double getDiscount(int showSequence) {
-        double specialDiscount = 0;
+
+    //change the input parameter to be Showing object
+    //add more discount rules here and we only consider the biggest discount value
+    private double getDiscount(Showing showing) {
+        double result = 0;
         if (MOVIE_CODE_SPECIAL == specialCode) {
-            specialDiscount = ticketPrice * 0.2;  // 20% discount for special movie
+            result = Math.max(ticketPrice * 0.2, result);  // 20% discount for special movie
         }
 
-        double sequenceDiscount = 0;
-        if (showSequence == 1) {
-            sequenceDiscount = 3; // $3 discount for 1st show
-        } else if (showSequence == 2) {
-
-            sequenceDiscount = 2; // $2 discount for 2nd show
+        // sequence discount
+        if (sequenceDiscountMap.get(showing.getSequenceOfTheDay()) != null) {
+            Double discount = sequenceDiscountMap.get(showing.getSequenceOfTheDay());
+            result = Math.max(result, discount);
         }
-//        else {
-//            throw new IllegalArgumentException("failed exception");
-//        }
 
+        // showStartTime discount
+        if (DISCOUNT_START_TIME <= showing.getStartTime().getHour()
+                && showing.getStartTime().getHour() <= DISCOUNT_END_TIME) {
+            result = Math.max(result, ticketPrice * 0.25);
+        }
+
+        // date discount
+        if (showing.getStartTime().getDayOfMonth() == DISCOUNT_DAY_IN_MONTH) {
+            result = Math.max(result, 1);
+        }
         // biggest discount wins
-        return specialDiscount > sequenceDiscount ? specialDiscount : sequenceDiscount;
+        return result;
     }
 
     @Override

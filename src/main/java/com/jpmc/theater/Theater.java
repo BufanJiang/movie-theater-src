@@ -14,9 +14,9 @@ public class Theater {
     public Theater(LocalDateProvider provider) {
         this.provider = provider;
 
-        Movie spiderMan = new Movie("Spider-Man: No Way Home", Duration.ofMinutes(90), 12.5, 1);
-        Movie turningRed = new Movie("Turning Red", Duration.ofMinutes(85), 11, 0);
-        Movie theBatMan = new Movie("The Batman", Duration.ofMinutes(95), 9, 0);
+        Movie spiderMan = new Movie("Spider-Man: No Way Home", "discription", Duration.ofMinutes(90), 12.5, 1);
+        Movie turningRed = new Movie("Turning Red", "discription", Duration.ofMinutes(85), 11, 0);
+        Movie theBatMan = new Movie("The Batman","discription", Duration.ofMinutes(95), 9, 0);
         schedule = List.of(
             new Showing(turningRed, 1, LocalDateTime.of(provider.currentDate(), LocalTime.of(9, 0))),
             new Showing(spiderMan, 2, LocalDateTime.of(provider.currentDate(), LocalTime.of(11, 0))),
@@ -45,9 +45,33 @@ public class Theater {
         System.out.println(provider.currentDate());
         System.out.println("===================================================");
         schedule.forEach(s ->
-                System.out.println(s.getSequenceOfTheDay() + ": " + s.getStartTime() + " " + s.getMovie().getTitle() + " " + humanReadableFormat(s.getMovie().getRunningTime()) + " $" + s.getMovieFee())
+                System.out.println(s.getSequenceOfTheDay() + ": " + s.getStartTime() + " " + s.getMovie().getTitle() + " " + s.getMovie().getDescription() + " " + humanReadableFormat(s.getMovie().getRunningTime()) + " $" + s.getMovieFee())
         );
         System.out.println("===================================================");
+    }
+
+    public void printScheduleSimpleAndJson() {
+        System.out.println(provider.currentDate());
+        System.out.println("=======================simple============================");
+        schedule.forEach(s ->
+                System.out.println(s.getSequenceOfTheDay() + ": " + s.getStartTime() + " " + s.getMovie().getTitle() + " " + s.getMovie().getDescription() + " " + humanReadableFormat(s.getMovie().getRunningTime()) + " $" + s.getMovieFee())
+        );
+        System.out.println("=======================simple============================");
+
+        System.out.println("=======================json============================");
+        schedule.forEach(s -> {
+            System.out.println("{");
+            System.out.println("    \"sequenceOfTheDay\": " + s.getSequenceOfTheDay() + ",");
+            System.out.println("    \"showStartTime\": " + s.getStartTime() + ",");
+            System.out.println("    \"movieTitle\": " + "\""+s.getMovie().getTitle() + "\"" + ",");
+            System.out.println("    \"movieDescription\": " + "\"" + s.getMovie().getDescription() + "\"" + ",");
+            System.out.println("    \"movieRunningTime\": " + "\"" + humanReadableFormat(s.getMovie().getRunningTime()) + "\"" + ",");
+            System.out.println("    \"movieFee\": " + s.getMovieFee() + ",");
+            System.out.println("}");
+            }
+
+        );
+        System.out.println("=======================json============================");
     }
 
     public String humanReadableFormat(Duration duration) {

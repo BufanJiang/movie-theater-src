@@ -13,7 +13,8 @@ public class Customer {
      * @param id customer id
      */
     public Customer(String name, String id) {
-        this.id = id; // NOTE - id is not used anywhere at the moment
+        //I used id in TheaterTests class(testReserve() test case) which calls equals method to compare two Customer objects
+        this.id = id; // NOT ANY MORE!!! NOTE - id is not used anywhere at the moment
 
         this.name = name;
 

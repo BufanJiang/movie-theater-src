@@ -1,6 +1,7 @@
 package com.jpmc.theater;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Showing {
     private Movie movie;
@@ -33,7 +34,24 @@ public class Showing {
         return sequenceOfTheDay;
     }
 
-    private double calculateFee(int audienceCount) {
+    //change private method to be public method, we need to use this method in unit tests
+    public double calculateFee(int audienceCount) {
         return movie.calculateTicketPrice(this) * audienceCount;
+    }
+
+    //add equals() and hashCode() to compare two Showing objects, which is used for testing purposes
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Showing showing = (Showing) o;
+        return movie.equals(showing.movie)
+                && Objects.equals(sequenceOfTheDay, showing.sequenceOfTheDay)
+                && Objects.equals(showStartTime, showing.showStartTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(movie, sequenceOfTheDay, showStartTime);
     }
 }
